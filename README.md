@@ -1,1 +1,1 @@
-# shopsquad.github.io
+# shopsquadpro.github.io
