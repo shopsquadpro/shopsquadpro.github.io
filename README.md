@@ -1,0 +1,1 @@
+# shopsquad.github.io
