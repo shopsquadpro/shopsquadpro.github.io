@@ -1,9 +1,63 @@
 <!doctype html>
 <html lang="en">
-  <head><meta charset="utf-8"><title>Privacy Policy</title></head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacidad - RecetaFlex</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="email-protection.js"></script>
+  </head>
   <body>
-    <h1>Privacy Policy</h1>
-    <p>Content coming soon.</p>
-    <p><a href="index.html">Back to home</a></p>
+    <header class="header">
+      <h1 class="brand"><img src="assets/logos.png" alt="RecetaFlex Logo" class="brand-logo"> Receta Flex</h1>
+      <nav>
+        <a href="index.html">Inicio</a>
+        <a href="privacy.html">Privacidad</a>
+        <a href="terms.html">Términos</a>
+        <a href="support.html">Soporte</a>
+      </nav>
+    </header>
+    <div class="container">
+      <div class="card" style="text-align: left; max-width: 900px; margin: 2rem auto;">
+        <h2 style="text-align: center;">Política de Privacidad</h2>
+        <p style="text-align: center; color: #999; font-size: 0.9rem; margin-bottom: 2rem;">Fecha de Vigencia: 9 de noviembre de 2025</p>
+        
+        <p>Recetaflex ("nosotros", "nuestro" o "nos") opera la aplicación iOS Recetaflex. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos su información.</p>
+        
+        <h3 style="margin-top: 2rem;">1. Información que Recopilamos</h3>
+        <p>Podemos recopilar información básica como su nombre, dirección de correo electrónico y datos de uso necesarios para proporcionar y mejorar la funcionalidad de la aplicación.</p>
+        
+        <h3 style="margin-top: 2rem;">2. Cómo Usamos la Información</h3>
+        <p>Utilizamos los datos recopilados para operar, mantener y mejorar Recetaflex, comunicarnos con los usuarios y garantizar la seguridad de la aplicación.</p>
+        
+        <h3 style="margin-top: 2rem;">3. Compartir Datos</h3>
+        <p>No vendemos ni alquilamos sus datos personales. Podemos compartir información solo cuando la ley lo requiera o para proteger nuestros derechos legales.</p>
+        
+        <h3 style="margin-top: 2rem;">4. Seguridad de Datos</h3>
+        <p>Utilizamos medidas de seguridad razonables para proteger sus datos, pero no podemos garantizar seguridad completa.</p>
+        
+        <h3 style="margin-top: 2rem;">5. Sus Derechos</h3>
+        <p>Puede solicitar acceder o eliminar sus datos personales contactándonos.</p>
+        
+        <h3 style="margin-top: 2rem;">6. Contáctenos</h3>
+        <p>Para preguntas sobre esta política, contacte:</p>
+        <p style="line-height: 1.8; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;">
+          <strong>Recetaflex</strong><br>
+          <span id="contact-address" style="pointer-events: none;"></span><br>
+          Email: <span id="contact-email" style="pointer-events: none;"></span>
+        </p>
+        
+        <h3 style="margin-top: 2rem;">7. Actualizaciones</h3>
+        <p>Podemos actualizar esta política. El uso continuo de la aplicación significa que acepta la versión revisada.</p>
+        
+        <div style="text-align: center; margin-top: 3rem;">
+          <a href="index.html" class="btn">Volver al inicio</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      renderProtectedAddress('contact-address');
+      renderProtectedEmail('contact-email', false);
+    </script>
   </body>
 </html>

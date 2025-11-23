@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soporte - RecetaFlex</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="email-protection.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="brand"><img src="assets/logos.png" alt="RecetaFlex Logo" class="brand-logo"> Receta Flex</h1>
+      <nav>
+        <a href="index.html">Inicio</a>
+        <a href="privacy.html">Privacidad</a>
+        <a href="terms.html">Términos</a>
+        <a href="support.html">Soporte</a>
+      </nav>
+    </header>
+    <div class="container">
+      <div class="card">
+        <h2>Soporte Técnico</h2>
+        <p class="mt-2">¿Necesitas ayuda? Estamos aquí para asistirte.</p>
+        <p>Por favor, contáctanos por correo electrónico:</p>
+        <div class="email-container" style="user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;">
+          <span id="email-display" style="pointer-events: none;"></span>
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+          <a href="index.html" class="btn">Volver al inicio</a>
+        </div>
+      </div>
+    </div>
+    <script>
+      renderProtectedEmail('email-display', false);
+    </script>
+  </body>
+</html>
+
