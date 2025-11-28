@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .config {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .config input {
+            padding: 8px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+        .config button {
+            padding: 8px 15px;
+            margin-top: 8px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        select, button {
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover { background: #0056CC; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .results {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f9f9f9;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover { background: #f9f9f9; }
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Analytics Dashboard</h1>
+        
+        <div class="config">
+            <strong>Configuration:</strong><br>
+            <label>
+                Supabase Function URL:
+                <input type="text" id="functionUrl" placeholder="https://your-project.supabase.co/functions/v1/analytics" />
+            </label><br>
+            <label>
+                Supabase Anon Key:
+                <input type="password" id="anonKey" placeholder="Your Supabase anon key (safe for read-only)" />
+            </label><br>
+            <label>
+                Admin Password (optional):
+                <input type="password" id="adminPassword" placeholder="Leave empty if not configured" />
+            </label><br>
+            <button onclick="saveConfig()">Save Configuration</button>
+        </div>
+        
+        <div class="controls">
+            <label for="querySelect">Query: </label>
+            <select id="querySelect">
+                <option value="users">Users by Platform & Country</option>
+                <option value="data_inventory">Data Inventory</option>
+            </select>
+            <button onclick="loadData()">Load Data</button>
+            <button onclick="exportData()" id="exportBtn" disabled>Export CSV</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Load saved configuration
+        const savedUrl = localStorage.getItem('analyticsFunctionUrl');
+        const savedKey = localStorage.getItem('analyticsAnonKey');
+        const savedPassword = localStorage.getItem('analyticsAdminPassword');
+        
+        if (savedUrl) {
+            document.getElementById('functionUrl').value = savedUrl;
+        }
+        if (savedKey) {
+            document.getElementById('anonKey').value = savedKey;
+        }
+        if (savedPassword) {
+            document.getElementById('adminPassword').value = savedPassword;
+        }
+
+        function saveConfig() {
+            const url = document.getElementById('functionUrl').value;
+            const key = document.getElementById('anonKey').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (url) {
+                localStorage.setItem('analyticsFunctionUrl', url);
+            }
+            if (key) {
+                localStorage.setItem('analyticsAnonKey', key);
+            }
+            if (password) {
+                localStorage.setItem('analyticsAdminPassword', password);
+            } else {
+                localStorage.removeItem('analyticsAdminPassword');
+            }
+            
+            alert('Configuration saved!');
+        }
+
+        function getApiUrl() {
+            return document.getElementById('functionUrl').value || localStorage.getItem('analyticsFunctionUrl');
+        }
+
+        function getAnonKey() {
+            return document.getElementById('anonKey').value || localStorage.getItem('analyticsAnonKey');
+        }
+
+        function getAdminPassword() {
+            return document.getElementById('adminPassword').value || localStorage.getItem('analyticsAdminPassword') || '';
+        }
+
+        let currentData = null;
+
+        async function loadData() {
+            const query = document.getElementById('querySelect').value;
+            const apiUrl = getApiUrl();
+            const anonKey = getAnonKey();
+            const adminPassword = getAdminPassword();
+            const resultsDiv = document.getElementById('results');
+            
+            if (!apiUrl) {
+                resultsDiv.innerHTML = '<div class="error">Please configure the Function URL first.</div>';
+                return;
+            }
+            
+            if (!anonKey) {
+                resultsDiv.innerHTML = '<div class="error">Please configure the Anon Key first.</div>';
+                return;
+            }
+            
+            resultsDiv.innerHTML = '<div class="loading">Loading...</div>';
+
+            try {
+                // Build URL with optional password
+                let requestUrl = apiUrl + '?query=' + query;
+                if (adminPassword) {
+                    requestUrl += '&password=' + encodeURIComponent(adminPassword);
+                }
+                
+                const headers = {
+                    'Authorization': 'Bearer ' + anonKey,
+                    'apikey': anonKey
+                };
+                
+                // Also send password in header as alternative
+                if (adminPassword) {
+                    headers['x-admin-password'] = adminPassword;
+                }
+                
+                const response = await fetch(requestUrl, { headers });
+                
+                const json = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(json.error || 'Request failed');
+                }
+
+                currentData = json.data;
+                displayTable(json.data);
+                document.getElementById('exportBtn').disabled = false;
+
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
+                console.error(error);
+            }
+        }
+
+        function displayTable(data) {
+            if (!data || data.length === 0) {
+                document.getElementById('results').innerHTML = 
+                    '<div class="loading">No data found.</div>';
+                return;
+            }
+
+            const keys = Object.keys(data[0]);
+            let html = '<div class="results"><table><thead><tr>';
+            
+            keys.forEach(key => {
+                html += '<th>' + key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + '</th>';
+            });
+            html += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                html += '<tr>';
+                keys.forEach(key => {
+                    const value = row[key];
+                    html += '<td>' + (value !== null && value !== undefined ? value : '') + '</td>';
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function exportData() {
+            if (!currentData || currentData.length === 0) return;
+
+            const keys = Object.keys(currentData[0]);
+            const headers = keys.join(',');
+            const rows = currentData.map(row => 
+                keys.map(key => {
+                    const value = row[key];
+                    if (value === null || value === undefined) return '';
+                    const str = String(value);
+                    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                        return '"' + str.replace(/"/g, '""') + '"';
+                    }
+                    return str;
+                }).join(',')
+            );
+
+            const csv = [headers, ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'analytics-' + Date.now() + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-load on page load if config is saved
+        window.addEventListener('load', () => {
+            if (savedUrl && savedKey) {
+                loadData();
+            }
+        });
+    </script>
+</body>
+</html>
+
