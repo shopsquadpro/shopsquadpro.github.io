@@ -369,9 +369,47 @@
                 return str.startsWith('http://') || str.startsWith('https://');
             };
 
+            const isDateTime = (value) => {
+                if (!value || typeof value !== 'string') return false;
+                const str = value.trim();
+                // Match ISO 8601 format: YYYY-MM-DDTHH:mm:ss or with timezone
+                return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str);
+            };
+
+            const formatDateTime = (dateString) => {
+                try {
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return dateString; // Invalid date, return original
+                    return date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                } catch (e) {
+                    return dateString; // If parsing fails, return original
+                }
+            };
+
             const formatValue = (value, maxChars) => {
                 if (value === null || value === undefined) return { text: '', full: '', isUrl: false };
-                const fullText = Array.isArray(value) ? value.join(', ') : String(value);
+                
+                let fullText;
+                if (Array.isArray(value)) {
+                    fullText = value.join(', ');
+                } else {
+                    const strValue = String(value);
+                    // Check if it's a date/time and format it
+                    if (isDateTime(strValue)) {
+                        fullText = formatDateTime(strValue);
+                    } else {
+                        fullText = strValue;
+                    }
+                }
+                
                 const url = isUrl(fullText);
                 const text = fullText.length > maxChars ? fullText.substring(0, maxChars) + '...' : fullText;
                 return { text, full: fullText, isTruncated: fullText.length > maxChars, isUrl: url };
